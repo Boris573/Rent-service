@@ -345,7 +345,7 @@ export const baseThemeOptions: ThemeOptions = {
     },
     h6: {
       fontWeight: 600,
-      fontSize: '1.125rem',
+      fontSize: '1rem',
       lineHeight: 1.375
     }
   },

@@ -4,6 +4,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { MainLayout } from '../components/Layout/MainLayout';
 import Houses from 'src/components/Houses';
+import Items from 'src/components/Item';
 
 const AppRouter: React.FC = () => (
   <MainLayout>
@@ -12,11 +13,10 @@ const AppRouter: React.FC = () => (
         <Route path="/" element={<Houses />} />
       </Route>
       {/* <Route index element={<Navigate to="/home" replace />} /> */}
-      {/* <Route path="/customers" element={<Layout />}>
-        <Route index element={<Navigate to="/customers/all" replace />} />
-        <Route path="all" element={<Customers />} />
+      <Route path="/item/" element={<Layout />}>
+        <Route path=":itemId" element={<Items />} />
       </Route>
-      <Route path="/orders" element={<Layout />}>
+      {/* <Route path="/orders" element={<Layout />}>
         <Route index element={<Navigate to="/orders/all" replace />} />
         <Route path="all" element={<Orders />} />
       </Route>

@@ -35,8 +35,8 @@ class ItemsApi {
     update: ItemBody;
   }): Promise<Item> {
     const { data: item } = await axiosInstance.put(
-      `/items/${itemId}`,
-      update
+      `/items`,
+      { id: itemId, ...update }
     );
   
     return item;
