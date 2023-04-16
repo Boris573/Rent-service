@@ -7,6 +7,7 @@ import {
   Button,
   ButtonBase,
   IconButton,
+  Link,
   Toolbar,
   Typography
 } from '@mui/material';
@@ -14,6 +15,8 @@ import { styled } from '@mui/material/styles';
 import type { AppBarProps } from '@mui/material';
 import { Menu as MenuIcon } from '../../assets/icons/menu';
 import { UserCircle as UserCircleIcon } from '../../assets/icons/user-circle';
+import OfferDialog from '../HouseDialog';
+import { getItems } from 'src/slices/item';
 // import { AccountPopover } from './AccountPopover';
 
 interface MainNavbarProps extends AppBarProps {
@@ -92,6 +95,19 @@ const AccountButton = () => {
 export const MainNavbar: FC<MainNavbarProps> = (props) => {
   const { onOpenSidebar, ...other } = props;
 
+  const [isOfferDialogOpen, setOfferDialogOpen] = useState(false);
+
+  const handleRowClick = (): void => {
+    setOfferDialogOpen(true);
+  };
+
+  const handleLocationDialogClose = (success?: boolean): void => {
+    setOfferDialogOpen(false);
+    if (success) {
+      getItems();
+    }
+  };
+
   return (
     <MainNavbarRoot
       sx={{
@@ -123,16 +139,25 @@ export const MainNavbar: FC<MainNavbarProps> = (props) => {
         >
           <MenuIcon fontSize="small" />
         </IconButton>
-        <Typography color="text.primary" variant='h5'>Rent service</Typography>
+        <Link href="/" underline="none">
+          <Typography color="text.primary" variant='h5'>Rent service</Typography>
+        </Link>
         <Box sx={{ flexGrow: 1 }} />
         <Button
           variant="contained"
-          // onClick={}
+          onClick={() => handleRowClick()}
         >
           Добавить объявление
         </Button>
         <AccountButton />
       </Toolbar>
+      <OfferDialog
+        onAddComplete={() => handleLocationDialogClose(true)}
+        onClose={() => handleLocationDialogClose()}
+        onDeleteComplete={() => handleLocationDialogClose(true)}
+        onEditComplete={() => handleLocationDialogClose(true)}
+        open={isOfferDialogOpen}
+      />
     </MainNavbarRoot>
   );
 };

@@ -12,9 +12,9 @@ const MainRouter = () => {
     return <SplashScreen />;
   }
 
-  // if (!isAuthenticated) {
-  //   return <AuthRouter />;
-  // }
+  if (!isAuthenticated) {
+    return <AuthRouter />;
+  }
 
   return <AppRouter />;
 };

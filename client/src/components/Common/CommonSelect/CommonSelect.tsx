@@ -28,7 +28,6 @@ const CommonSelect: React.FC<Props> = ({
     <FormControl
       fullWidth
       variant="outlined"
-      margin='normal'
     >
       <InputLabel>
         {label}

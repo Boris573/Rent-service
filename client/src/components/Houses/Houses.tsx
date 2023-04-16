@@ -17,13 +17,13 @@ const Houses = () => {
       display="flex"
       flexDirection="row"
       flexWrap="wrap"
-      alignItems="center"
+      alignItems="flex-start"
       justifyContent="left"
       p={4}
     >
       {
         items.map((item) => (
-          <HouseListItem item={item} />
+          <HouseListItem key={item.id} item={item} />
         ))
       }
     </Box>

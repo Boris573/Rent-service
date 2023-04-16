@@ -1,15 +1,30 @@
 export interface Item {
-  _id: string;
-  images?: string[] | null;
+  id: string;
+  title: string;
+  image?: string | null;
   type: string;
   price: number;
   description?: string | null;
-  address1: string;
-  address2?: string;
-  params?: string[];
+  flatNumber?: string;
+  houseNumber: string;
+  street: string;
+  city: string;
+  country: string;
+  params?: {
+    hasKitchen?: boolean;
+    hasWorkZone?: boolean;
+    hasParking?: boolean;
+    hasGym?: boolean;
+    hasWifi?: boolean;
+    hasTV?: boolean;
+    hasIron?: boolean;
+    hasPool?: boolean;
+    hasElevator?: boolean;
+  },
   host?: string;
+  roomCount: number;
   createdAt?: string;
   updatedAt?: string;
 }
 
-export interface ItemBody extends Omit<Item, '_id'> {}
+export interface ItemBody extends Omit<Item, 'id'> {}

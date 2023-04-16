@@ -14,7 +14,7 @@ export interface AuthContextValue extends State {
   platform: 'JWT';
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  register: (email: string, name: string, password: string) => Promise<void>;
+  register: (fullName: string, email: string, password: string) => Promise<void>;
 }
 
 interface AuthProviderProps {
@@ -124,13 +124,9 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
     const initialize = async (): Promise<void> => {
       try {
         const accessToken = globalThis.localStorage.getItem('accessToken');
+        const user = JSON.parse(globalThis.localStorage.getItem('user'))
 
         if (accessToken) {
-          const { organization, ...user } = await authApi.me();
-          if (!organization) {
-            throw new Error('Organization not found');
-          }
-
           dispatch({
             type: ActionType.INITIALIZE,
             payload: {
@@ -163,11 +159,9 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
   }, []);
 
   const loginUser = async (email: string, password: string): Promise<void> => {
-    const { accessToken } = await authApi.login(email, password);
+    const { token, ...user } = await authApi.login(email, password);
 
-    localStorage.setItem('accessToken', accessToken);
-
-    const { ...user } = await authApi.me();
+    localStorage.setItem('accessToken', token);
 
     dispatch({
       type: ActionType.LOGIN,
@@ -183,13 +177,13 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
   };
 
   const registerUser = async (
+    fullName: string,
     email: string,
-    name: string,
     password: string
   ): Promise<void> => {
-    const accessToken = await authApi.register(email, name, password);
-    localStorage.setItem('accessToken', accessToken);
-    const { organization, ...user } = await authApi.me();
+    const { token, ...user } = await authApi.register(fullName, email, password);
+    localStorage.setItem('accessToken', token);
+    localStorage.setItem('user', JSON.stringify(user));
 
     if (user) {
       dispatch({

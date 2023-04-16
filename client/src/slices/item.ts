@@ -22,6 +22,22 @@ const slice = createSlice({
     ): void {
       state.items = action.payload;
     },
+    getItemById(
+      state: ItemState,
+      action: PayloadAction<Item>
+    ): void {
+      const item = action.payload;
+
+      state.items = state.items.length
+        ? state.items.map((_item) => {
+            if (_item.id === item.id) {
+              return item;
+            }
+
+            return _item;
+          })
+        : [action.payload];
+    },
     createItem(
       state: ItemState,
       action: PayloadAction<Item>
@@ -35,7 +51,7 @@ const slice = createSlice({
       const item = action.payload;
 
       state.items = state.items.map((_item) => {
-        if (_item._id === item._id) {
+        if (_item.id === item.id) {
           return item;
         }
 
@@ -46,7 +62,7 @@ const slice = createSlice({
       state: ItemState,
       action: PayloadAction<string>
     ): void {
-      state.items = state.items.filter((item) => item._id !== action.payload);
+      state.items = state.items.filter((item) => item.id !== action.payload);
     }
   }
 });
@@ -57,6 +73,12 @@ export const getItems = (): AppThunk => async (dispatch): Promise<void> => {
   const data = await itemApi.getItems();
 
   dispatch(slice.actions.getItems(data));
+};
+
+export const getItemById = (itemId: string): AppThunk => async (dispatch): Promise<void> => {
+  const data = await itemApi.getItemById(itemId);
+
+  dispatch(slice.actions.getItemById(data));
 };
 
 export const createItem = (createData: ItemBody): AppThunk => async (dispatch): Promise<void> => {

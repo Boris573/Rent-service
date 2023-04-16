@@ -11,14 +11,14 @@ const Login = () => {
   const navigate = useNavigate();
   const formik = useFormik({
     initialValues: {
-      email: '',
+      username: '',
       password: '',
       submit: null
     },
     validationSchema: VALIDATION_SCHEMA,
     onSubmit: async (values, helpers) => {
       try {
-        await login(values.email, values.password);
+        await login(values.username, values.password);
         navigate('/');
       } catch (err) {
         console.error(err);
@@ -49,34 +49,27 @@ const Login = () => {
               color="textPrimary"
               variant="h4"
             >
-              Sign in
-            </Typography>
-            <Typography
-              color="textSecondary"
-              gutterBottom
-              variant="body2"
-            >
-              Sign in on the internal platform
+              Войти в аккаунт
             </Typography>
           </Box>
           <TextField
-            error={Boolean(formik.touched.email && formik.errors.email)}
+            error={Boolean(formik.touched.username && formik.errors.username)}
             fullWidth
-            helperText={formik.touched.email && formik.errors.email}
-            label="Email Address"
+            helperText={formik.touched.username && formik.errors.username}
+            label="Имя пользователя или почта"
             margin="normal"
-            name="email"
+            name="username"
             onBlur={formik.handleBlur}
             onChange={formik.handleChange}
-            type="email"
-            value={formik.values.email}
+            type="username"
+            value={formik.values.username}
             variant="outlined"
           />
           <TextField
             error={Boolean(formik.touched.password && formik.errors.password)}
             fullWidth
             helperText={formik.touched.password && formik.errors.password}
-            label="Password"
+            label="Пароль"
             margin="normal"
             name="password"
             onBlur={formik.handleBlur}
@@ -101,14 +94,14 @@ const Login = () => {
               type="submit"
               variant="contained"
             >
-              Sign In Now
+              Войти в аккаунт
             </Button>
           </Box>
           <Typography
             color="textSecondary"
             variant="body2"
           >
-            Don't have an account?
+            Нет аккаунта?
             {' '}
             <Link
               href="/register"
@@ -118,7 +111,7 @@ const Login = () => {
                 cursor: 'pointer'
               }}
             >
-              Sign Up
+              Зарегистрироваться
             </Link>
           </Typography>
         </form>
@@ -130,16 +123,14 @@ const Login = () => {
 export default Login;
 
 const VALIDATION_SCHEMA = Yup.object({
-  email: Yup
+  username: Yup
     .string()
-    .email(
-      'Must be a valid email')
     .max(255)
     .required(
-      'Email is required'),
+      'Требуется имя пользователя'),
   password: Yup
     .string()
     .max(255)
     .required(
-      'Password is required')
+      'Требуется пароль')
 });

@@ -3,34 +3,34 @@ import axiosInstance from './axiosInstance';
 
 class AuthApi {
   async login(
-    email: string,
+    username: string,
     password: string
   ): Promise<{
-    accessToken: string;
-    refreshToken: string;
-    user: Admin;
+    token: string;
+    id: string;
+    username: string;
+    fullName: string;
    }> {
-    const { data } = await axiosInstance.post('/auth/login', { email, password });
-  
+    const { data } = await axiosInstance.post('/auth/login', { username, password });
+    console.log(data)
     return data;
   };
 
   async register(
-    email: string,
-    name: string,
+    fullName: string,
+    username: string,
     password: string
-  ): Promise<string> {
+  ): Promise<{
+    token: string;
+    id: string;
+    username: string;
+    fullName: string;
+   }> {
     const {
-      data: { accessToken },
-    } = await axiosInstance.post('/auth/register', { email, name, password });
+      data,
+    } = await axiosInstance.post('/auth/register', { fullName, username, password });
   
-    return accessToken;
-  };
-
-  async me(): Promise<Admin> {
-    const { data: user } = await axiosInstance.get('/auth/me');
-  
-    return user;
+    return data;
   };
 }
 

@@ -3,7 +3,6 @@ package api.api.Item;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -13,12 +12,17 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 public class Item {
     @Id
-    private ObjectId id;
+    private String id;
+    private String title;
+    private String image;
     private String type;
-    private String description;
     private Number price;
-    private String address1;
-    private String address2;
-    private String[] params;
+    private String description;
+    private String flatNumber;
+    private String houseNumber;
+    private String street;
+    private String city;
+    private String country;
+    private Object params;
     private String host;
 }
