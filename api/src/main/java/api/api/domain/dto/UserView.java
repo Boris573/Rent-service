@@ -5,6 +5,7 @@ public record UserView(
 
   String username,
   String fullName,
+  String avatar,
   String role,
   String token
 ) {

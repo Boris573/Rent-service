@@ -19,6 +19,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { useMounted } from "../../hooks/useMounted";
 import { Logo } from "../Layout/Logo";
+import { AdminBody } from "src/types/admin";
 
 export const Register: FC = (props) => {
   const isMounted = useMounted();
@@ -29,12 +30,19 @@ export const Register: FC = (props) => {
       fullName: "",
       username: "",
       password: "",
+      avatar: '',
       submit: null,
     },
     validationSchema: VALIDATION_SCHEMA,
     onSubmit: async (values, helpers): Promise<void> => {
+      const user: AdminBody = {
+        fullName: values.fullName,
+        username: values.fullName,
+        password: values.password,
+        avatar: values.avatar,        
+      }
       try {
-        await register(values.fullName, values.username, values.password);
+        await register(user);
         navigate("/");
       } catch (err) {
         console.error(err);
@@ -96,8 +104,18 @@ export const Register: FC = (props) => {
                     name="fullName"
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
-                    type="fullName"
                     value={formik.values.fullName}
+                  />
+                  <TextField
+                    error={Boolean(formik.touched.avatar && formik.errors.avatar)}
+                    fullWidth
+                    helperText={formik.touched.avatar && formik.errors.avatar}
+                    label="Фото"
+                    margin="normal"
+                    name="avatar"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    value={formik.values.avatar}
                   />
                   <TextField
                     error={Boolean(formik.touched.username && formik.errors.username)}
@@ -108,7 +126,6 @@ export const Register: FC = (props) => {
                     name="username"
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
-                    type="username"
                     value={formik.values.username}
                   />
                   <TextField
@@ -174,4 +191,5 @@ const VALIDATION_SCHEMA = Yup.object({
     .max(255)
     .required("Требуется имя аккаунт"),
   password: Yup.string().min(7).max(255).required("Требуется пароль"),
+  avatar: Yup.string(),
 });

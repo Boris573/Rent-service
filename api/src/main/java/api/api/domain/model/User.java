@@ -31,6 +31,7 @@ public class User extends ComparableEntity implements UserDetails {
   private String username;
   private String password;
   private String fullName;
+  private String avatar;
   private String role;
   private Set<Role> authorities = new HashSet<>();
 

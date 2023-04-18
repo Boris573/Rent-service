@@ -2,7 +2,7 @@ import { Box } from "@mui/system";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from 'src/store';
 import { getItems } from "src/slices/item";
-import HouseListItem from "./HouseListItem";
+import HouseListItem from "../HouseListItem";
 
 const Houses = () => {
   const dispatch = useDispatch();

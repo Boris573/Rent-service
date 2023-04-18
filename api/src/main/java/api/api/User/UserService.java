@@ -16,6 +16,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 
 @Service
 @Transactional(readOnly = true)
@@ -27,8 +29,11 @@ public class UserService implements UserDetailsService {
   private final UserViewMapper userViewMapper;
   private final PasswordEncoder passwordEncoder;
 
+  @Autowired
+  MongoTemplate mongoTemplate;
+
   @Transactional
-  public UserView create(CreateUserRequest request) {
+  public UserView create(CreateUserRequest request, String... token) {
     if (userRepo.findByUsername(request.username()).isPresent()) {
       throw new ValidationException("Username exists!");
     }
@@ -38,7 +43,7 @@ public class UserService implements UserDetailsService {
 
     user = userRepo.save(user);
 
-    return userViewMapper.toUserView(user);
+    return token.length > 0 ? userViewMapper.toUserView(user, token[0]) : userViewMapper.toUserView(user);
   }
 
   @Transactional
@@ -58,8 +63,7 @@ public class UserService implements UserDetailsService {
     if (optionalUser.isEmpty()) {
       return create(request);
     } else {
-      UpdateUserRequest updateUserRequest =
-          new UpdateUserRequest(request.fullName(), request.authorities());
+      UpdateUserRequest updateUserRequest = new UpdateUserRequest(request.fullName(), request.authorities());
       return update(optionalUser.get().getId(), updateUserRequest);
     }
   }
@@ -80,9 +84,8 @@ public class UserService implements UserDetailsService {
     return userRepo
         .findByUsername(username)
         .orElseThrow(
-            () ->
-                new UsernameNotFoundException(
-                    format("User with username - %s, not found", username)));
+            () -> new UsernameNotFoundException(
+                format("User with username - %s, not found", username)));
   }
 
   public boolean usernameExists(String username) {

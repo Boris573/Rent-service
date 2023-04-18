@@ -3,7 +3,10 @@ export interface Item {
   title: string;
   image?: string | null;
   type: string;
-  price: number;
+  buyPrice: number;
+  rentPrice: number;
+  isRent: boolean;
+  isSale: boolean;
   description?: string | null;
   flatNumber?: string;
   houseNumber: string;
@@ -25,6 +28,33 @@ export interface Item {
   roomCount: number;
   createdAt?: string;
   updatedAt?: string;
+}
+
+export const itemTypeOptions = [
+  {
+    label: "Дом",
+    value: "house",
+  },
+  {
+    label: "Квартира",
+    value: "flat",
+  },
+  {
+    label: "Комната",
+    value: "room",
+  },
+];
+
+
+export enum ITEM_PARAMS {
+  hasKitchen = 'Кухня',
+  hasWorkZone = 'Рабочая зона',
+  hasGym = 'Спортзал',
+  hasParking = 'Парковка',
+  hasPool = 'Бассейн',
+  hasWifi = 'Wi-Fi',
+  hasTV = 'Телевизор',
+  hasIron = 'Утюг',
 }
 
 export interface ItemBody extends Omit<Item, 'id'> {}

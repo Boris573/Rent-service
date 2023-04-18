@@ -1,4 +1,4 @@
-import { Admin } from 'src/types/admin';
+import { Admin, AdminBody } from 'src/types/admin';
 import axiosInstance from './axiosInstance';
 
 class AuthApi {
@@ -12,14 +12,12 @@ class AuthApi {
     fullName: string;
    }> {
     const { data } = await axiosInstance.post('/auth/login', { username, password });
-    console.log(data)
+
     return data;
   };
 
   async register(
-    fullName: string,
-    username: string,
-    password: string
+    user: AdminBody
   ): Promise<{
     token: string;
     id: string;
@@ -28,8 +26,14 @@ class AuthApi {
    }> {
     const {
       data,
-    } = await axiosInstance.post('/auth/register', { fullName, username, password });
+    } = await axiosInstance.post('/auth/register', user);
   
+    return data;
+  };
+
+  async me(): Promise<Admin> {
+    const { data } = await axiosInstance.get('/user/me');
+    console.log(data)
     return data;
   };
 }

@@ -18,9 +18,9 @@ import {
 import { Trash as TrashIcon } from '../../assets/icons/trash';
 import { createItem, deleteItem, updateItem } from '../../slices/item';
 import { useDispatch, useSelector } from '../../store';
-import type { Item, ItemBody } from '../../types/item';
+import { Item, ItemBody, itemTypeOptions } from '../../types/item';
 import CommonSelect from '../Common/CommonSelect';
-import { typeOptions } from '../Houses/constants';
+import { useAuth } from 'src/hooks/useAuth';
 
 interface OfferFormProps {
   canDelete?: boolean;
@@ -36,7 +36,10 @@ interface FormValues {
   title: string;
   image: string | null;
   type: string;
-  price: number;
+  rentPrice: number;
+  buyPrice: number;
+  isRent: boolean;
+  isSale: boolean;
   description: string | null;
   flatNumber: string;
   houseNumber: string;
@@ -68,6 +71,7 @@ const OfferDialog: FC<OfferFormProps> = (props) => {
     open,
   } = props;
   const dispatch = useDispatch();
+  const { user } = useAuth();
 
   const initialValues = useMemo(
     (): FormValues => {
@@ -81,7 +85,10 @@ const OfferDialog: FC<OfferFormProps> = (props) => {
           street: item.street || '',
           city: item.city || '',
           country: item.country || '',
-          price: item.price || 0,
+          rentPrice: item.rentPrice || 0,
+          buyPrice: item.buyPrice || 0,
+          isRent: item.isRent || false,
+          isSale: item.isSale || false,
           description: item.description || '',
           roomCount: item.roomCount || 1,
           host: item.host || '',
@@ -106,7 +113,10 @@ const OfferDialog: FC<OfferFormProps> = (props) => {
         street: '',
         city: '',
         country: '',
-        price: 0,
+        rentPrice: 0,
+        buyPrice: 0,
+        isRent: false,
+        isSale: false,
         description: '',
         roomCount: 1,
         host: '',
@@ -132,6 +142,16 @@ const OfferDialog: FC<OfferFormProps> = (props) => {
         .string()
         .max(60, 'Максимум 60 символов')
         .required('Требуется название'),
+      isSale: Yup.boolean(),
+      isRent: Yup.boolean(),
+      buyPrice: Yup.number().when('isSale', {
+        is: true,
+        then: Yup.number().min(10, "Минимальная цена - 10.00р").required('Укажите цену')
+      }),
+      rentPrice: Yup.number().when('isRent', {
+        is: true,
+        then: Yup.number().min(10, "Минимальная цена - 10.00р").required('Укажите цену')
+      })
     }),
     onSubmit: async (values, helpers): Promise<void> => {
       try {
@@ -144,10 +164,13 @@ const OfferDialog: FC<OfferFormProps> = (props) => {
           street: values.street,
           city: values.city,
           country: values.country,
-          price: values.price,
+          rentPrice: values.isRent ? values.rentPrice : 0,
+          buyPrice: values.isSale ? values.buyPrice : 0,
+          isRent: values.isRent,
+          isSale: values.isSale,
           roomCount: values.roomCount,
           description: values.description,
-          host: values.host,
+          host: user.id,
           params: {
             hasKitchen: values.hasKitchen,
             hasWorkZone: values.hasWorkZone,
@@ -160,6 +183,7 @@ const OfferDialog: FC<OfferFormProps> = (props) => {
             hasElevator: values.hasElevator,
           },
         };
+        console.log(data)
 
         if (item) {
           await dispatch(updateItem(item.id!, data));
@@ -177,6 +201,7 @@ const OfferDialog: FC<OfferFormProps> = (props) => {
           onEditComplete();
         }
       } catch (err: any) {
+        console.log(err)
         toast.error('Что-то пошло не так');
         helpers.setStatus({ success: false });
         helpers.setErrors({ submit: err.message });
@@ -226,28 +251,12 @@ const OfferDialog: FC<OfferFormProps> = (props) => {
                 <CommonSelect
                   label="Тип жилья"
                   name="type"
-                  options={typeOptions}
+                  options={itemTypeOptions}
                   value={formik.values.type}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   error={Boolean(formik.touched.type && formik.errors.type)}
                   helperText={formik.touched.type && formik.errors.type}
-                />
-              </Box>
-              <Box sx={{ mt: 2 }}>
-                <TextField
-                  error={Boolean(formik.touched.price && formik.errors.price)}
-                  fullWidth
-                  type="number"
-                  InputProps={{
-                    inputProps: { min: 0 }
-                  }}
-                  helperText={formik.touched.price && formik.errors.price}
-                  label="Цена за ночь, р."
-                  name="price"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  value={formik.values.price}
                 />
               </Box>
               <Box sx={{ mt: 2 }}>
@@ -276,6 +285,30 @@ const OfferDialog: FC<OfferFormProps> = (props) => {
                   onBlur={formik.handleBlur}
                   onChange={formik.handleChange}
                   value={formik.values.image}
+                />
+              </Box>
+              <Box sx={{ mt: 2, minHeight: 56, display: 'flex', alignItems: 'center' }}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={formik.values.isSale}
+                      name="isSale"
+                      onChange={formik.handleChange}
+                    />
+                  }
+                  label="Продажа"
+                />
+              </Box>
+              <Box sx={{ mt: 2, minHeight: 56, display: 'flex', alignItems: 'center' }}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={formik.values.isRent}
+                      name="isRent"
+                      onChange={formik.handleChange}
+                    />
+                  }
+                  label="Аренда"
                 />
               </Box>
             </Grid>
@@ -343,6 +376,40 @@ const OfferDialog: FC<OfferFormProps> = (props) => {
                     />
                   </Grid>
                 </Grid>
+              </Box>
+              <Box sx={{ mt: 2 }}>
+                <TextField
+                  error={Boolean(formik.touched.buyPrice && formik.errors.buyPrice)}
+                  fullWidth
+                  disabled={!formik.values.isSale}
+                  type="number"
+                  InputProps={{
+                    inputProps: { min: 0 }
+                  }}
+                  helperText={formik.touched.buyPrice && formik.errors.buyPrice}
+                  label="Цена, р."
+                  name="buyPrice"
+                  onBlur={formik.handleBlur}
+                  onChange={formik.handleChange}
+                  value={formik.values.buyPrice}
+                />
+              </Box>
+              <Box sx={{ mt: 2 }}>
+                <TextField
+                  error={Boolean(formik.touched.rentPrice && formik.errors.rentPrice)}
+                  fullWidth
+                  disabled={!formik.values.isRent}
+                  type="number"
+                  InputProps={{
+                    inputProps: { min: 0 }
+                  }}
+                  helperText={formik.touched.rentPrice && formik.errors.rentPrice}
+                  label="Цена, р."
+                  name="rentPrice"
+                  onBlur={formik.handleBlur}
+                  onChange={formik.handleChange}
+                  value={formik.values.rentPrice}
+                />
               </Box>
             </Grid>
             <Typography mx={2} mt={3} mb={2} variant='h5'>

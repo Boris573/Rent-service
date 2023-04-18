@@ -5,6 +5,7 @@ import Layout from '../components/Layout';
 import { MainLayout } from '../components/Layout/MainLayout';
 import Houses from 'src/components/Houses';
 import Items from 'src/components/Item';
+import Profile from 'src/components/Profile';
 
 const AppRouter: React.FC = () => (
   <MainLayout>
@@ -12,15 +13,13 @@ const AppRouter: React.FC = () => (
       <Route path="/" element={<Layout />}>
         <Route path="/" element={<Houses />} />
       </Route>
-      {/* <Route index element={<Navigate to="/home" replace />} /> */}
       <Route path="/item/" element={<Layout />}>
         <Route path=":itemId" element={<Items />} />
       </Route>
-      {/* <Route path="/orders" element={<Layout />}>
-        <Route index element={<Navigate to="/orders/all" replace />} />
-        <Route path="all" element={<Orders />} />
+      <Route path="/profile" element={<Layout />}>
+        <Route path="" element={<Profile />} />
       </Route>
-      <Route path="/products" element={<Layout />}>
+      {/* <Route path="/products" element={<Layout />}>
         <Route index element={<Navigate to="/products/all" replace />} />
         <Route path="all" element={<Products />} />
       </Route>
