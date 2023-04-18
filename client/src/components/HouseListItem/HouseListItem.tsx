@@ -1,16 +1,18 @@
 import { Box, Link, Typography } from "@mui/material";
-import { Item } from "src/types/item";
-import { typeOptions } from "./constants";
+import { Item, itemTypeOptions } from "src/types/item";
 import { Image as ImageIcon } from "../../assets/icons/image";
+import { formatPrice } from "src/utils/price";
 
 interface Props {
   item: Item;
 }
 
 const HouseListItem = ({ item }: Props) => {
-  const { id, title, type, price, country, city, image } = item;
+  const { id, title, type, rentPrice, buyPrice, country, city, image } = item;
 
-  const itemType = typeOptions.find((option) => option.value === type);
+  const itemType = itemTypeOptions.find((option) => option.value === type);
+
+  const price = rentPrice;
 
   return (
     <Link m={2} href={`/item/${id}`} underline="none" color="text">
@@ -60,7 +62,7 @@ const HouseListItem = ({ item }: Props) => {
           <Typography color="text.secondary" variant="subtitle2">
             {itemType.label}
           </Typography>
-          <Typography variant="subtitle1">{price}р.</Typography>
+          <Typography variant="subtitle1">{formatPrice(price)}</Typography>
         </Box>
       </Box>
     </Link>

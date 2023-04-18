@@ -1,26 +1,35 @@
 import { Box } from "@mui/system";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "src/store";
-import { getItemById } from "src/slices/item";
-import { useParams } from "react-router-dom";
-import { Button, Grid, Typography } from "@mui/material";
+import { deleteItem, getItemById } from "src/slices/item";
+import { useNavigate, useParams } from "react-router-dom";
+import { Button, Divider, Grid, IconButton, Typography } from "@mui/material";
 import { typeOptions } from "./constants";
 import OfferDialog from "../HouseDialog";
 import { Image as ImageIcon } from "../../assets/icons/image";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
-import { DemoContainer, DemoItem } from "@mui/x-date-pickers/internals/demo";
-import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
+import * as Yup from "yup";
+import { Trash as TrashIcon } from "../../assets/icons/trash";
 import moment from "moment";
+import { useAuth } from "src/hooks/useAuth";
+import Comments from "../Comments";
+import { useFormik } from "formik";
+import toast from "react-hot-toast";
+import { createOrder } from "src/slices/order";
+import { OrderBody, ORDER_TYPES } from "src/types/order";
+import OrderPanel from "./OrderPanel";
+import { mapParams } from "src/utils/mapParams";
 
 const Item = () => {
   const [isOfferDialogOpen, setOfferDialogOpen] = useState(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const { itemId } = useParams();
   const item = useSelector((state) =>
     state.item.items.find((_item) => _item.id === itemId)
   );
-  const { title, type, price, description, country, city, image } = item ?? {};
+  const { user } = useAuth();
+  const { id, title, type, description, host, country, city, rentPrice, image, roomCount, params } = item ?? {};
 
   const itemType = typeOptions.find((option) => option.value === type);
 
@@ -40,7 +49,68 @@ const Item = () => {
     }
   };
 
-  console.log(item);
+  const handleDelete = () => {
+    dispatch(deleteItem(id));
+    navigate('/');
+  }
+
+  const formik = useFormik({
+    enableReinitialize: true,
+    initialValues: {
+      type: ORDER_TYPES.RENT,
+      dateFrom: "",
+      dateTo: "",
+      totalPrice: "",
+      submit: null,
+    },
+    validationSchema: Yup.object({
+      dateFrom: Yup.string().required("Укажите, когда вы прибудете"),
+      dateTo: Yup.string()
+        .required("Укажите, когда вы будете выезжать")
+        .test(
+          "is-greater",
+          "Дата въезда должна быть раньше даты выезда",
+          function (value) {
+            const { dateFrom } = this.parent;
+            if (!dateFrom) return true;
+            return moment(value, "DD/MM/YYYY").isSameOrAfter(
+              moment(dateFrom, "DD/MM/YYYY")
+            );
+          }
+        ),
+    }),
+    onSubmit: async (values, helpers): Promise<void> => {
+      try {
+        const totalPrice =
+          (moment(values.dateTo, "DD/MM/YYYY").diff(
+            moment(values.dateFrom, "DD/MM/YYYY"),
+            "days"
+          ) +
+            1) *
+          rentPrice;
+
+        const data: OrderBody = {
+          orderType: values.type,
+          dateFrom: values.dateFrom,
+          dateTo: values.dateTo,
+          totalPrice: totalPrice,
+          item: id,
+          user: user.id,
+        };
+
+        await dispatch(createOrder(data));
+        toast.success("Бронь добавлена");
+
+        formik.resetForm();
+      } catch (err: any) {
+        console.log(err);
+        toast.error("Что-то пошло не так");
+        helpers.setStatus({ success: false });
+        helpers.setErrors({ submit: err.message });
+        helpers.setSubmitting(false);
+      }
+    },
+  });
 
   return (
     <Box
@@ -52,24 +122,29 @@ const Item = () => {
       py={4}
       px={10}
     >
-      <Box
-        width="100%"
-        mt={1}
-        mb={2}
-        display="flex"
-        flexDirection="row"
-        justifyContent="space-between"
-      >
-        <Typography variant="h5">{itemType?.label}</Typography>
-        <Button
-          onClick={() => {
-            handleRowClick();
-          }}
-          variant="contained"
+      {user?.id === host && (
+        <Box
+          width="100%"
+          mt={1}
+          mb={2}
+          display="flex"
+          flexDirection="row"
+          justifyContent="space-between"
         >
-          Редактировать
-        </Button>
-      </Box>
+          <Button
+            onClick={() => {
+              handleRowClick();
+            }}
+            variant="contained"
+          >
+            Редактировать
+          </Button>
+          <IconButton onClick={() => handleDelete()}>
+            <TrashIcon color="error" />
+          </IconButton>
+        </Box>
+      )}
+
       {image ? (
         <Box
           sx={{
@@ -108,6 +183,26 @@ const Item = () => {
             <Typography color="text.secondary" variant="subtitle1">
               {city}, {country}
             </Typography>
+            <Typography color="text.secondary" variant="subtitle1">
+              Тип жилья: {itemType?.label}
+            </Typography>
+            <Typography color="text.secondary" variant="subtitle1">
+              Количество комнат: {roomCount}
+            </Typography>
+            <Divider sx={{ mt: 3 }} />
+            <Box>
+              <Typography mt={3} mb={2} variant="h5">
+                Удобства
+              </Typography>
+              {params ? (
+                mapParams(params)
+              ) : (
+                <Typography mt={3} mb={2} variant="body1">
+                  К сожалению, удобств нет
+                </Typography>
+              )}
+            </Box>
+            <Divider sx={{ mt: 3, mb: 1 }} />
             <Typography
               mt={3}
               style={{ whiteSpace: "pre-line" }}
@@ -116,57 +211,10 @@ const Item = () => {
               {description}
             </Typography>
           </Box>
+          <Divider sx={{ mt: 3 }} />
+          <Comments item={item} user={user} />
         </Grid>
-        <Grid
-          item
-          xs={4}
-          sx={{
-            marginTop: 1,
-            position: "sticky",
-            top: 100,
-            boxShadow: "rgba(0, 0, 0, 0.12) 0px 6px 16px",
-            border: 1,
-            borderColor: "divider",
-            borderRadius: 2,
-            padding: 3,
-            flexDirection: "column",
-            height: "fit-content",
-          }}
-        >
-          <Box
-            display="flex"
-            flexDirection="row"
-            justifyContent="space-between"
-            alignItems="flex-end"
-          >
-            <Typography variant="body1">Цена за ночь:</Typography>
-            <Typography variant="h5">{price}р.</Typography>
-          </Box>
-          <LocalizationProvider dateAdapter={AdapterMoment}>
-            <DateRangePicker
-              sx={{
-                mt: 3,
-              }}
-              minDate={moment(new Date())}
-              localeText={{ start: "Прибытие", end: "Выезд" }}
-              // value={value}
-              // onChange={(newValue) => setValue(newValue)}
-            />
-            <Button
-              sx={{
-                mt: 2,
-                p: 1.5,
-                width: '100%',
-              }}
-              onClick={() => {
-                handleRowClick();
-              }}
-              variant="contained"
-            >
-              Забронировать
-            </Button>
-          </LocalizationProvider>
-        </Grid>
+        <OrderPanel item={item} user={user} />
       </Grid>
       <OfferDialog
         item={item}

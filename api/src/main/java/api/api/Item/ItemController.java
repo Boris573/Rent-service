@@ -8,10 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-// @RolesAllowed(Role.USER_ADMIN)
 @RequestMapping("/api/items")
 @RequiredArgsConstructor
 public class ItemController {
@@ -25,8 +23,8 @@ public class ItemController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Item>> getItemById(@PathVariable String id){
-        return new ResponseEntity<Optional<Item>>(service.findItemById(id), HttpStatus.OK);
+    public ResponseEntity<Item> getItemById(@PathVariable String id){
+        return new ResponseEntity<Item>(service.findItemById(id), HttpStatus.OK);
     }
 
     @PutMapping()

@@ -17,6 +17,8 @@ import { Menu as MenuIcon } from '../../assets/icons/menu';
 import { UserCircle as UserCircleIcon } from '../../assets/icons/user-circle';
 import OfferDialog from '../HouseDialog';
 import { getItems } from 'src/slices/item';
+import { useAuth } from 'src/hooks/useAuth';
+import { AccountPopover } from './AccountPopover';
 // import { AccountPopover } from './AccountPopover';
 
 interface MainNavbarProps extends AppBarProps {
@@ -46,12 +48,7 @@ const MainNavbarRoot = styled(AppBar)(
 const AccountButton = () => {
   const anchorRef = useRef<HTMLButtonElement | null>(null);
   const [openPopover, setOpenPopover] = useState<boolean>(false);
-  // To get the user from the authContext, you can use
-  // `const { user } = useAuth();`
-  const user = {
-    avatar: '/static/mock-images/avatars/avatar-anika_visser.png',
-    name: 'Anika Visser'
-  };
+  const { user } = useAuth();
 
   const handleOpenPopover = (): void => {
     setOpenPopover(true);
@@ -78,22 +75,24 @@ const AccountButton = () => {
             height: 40,
             width: 40
           }}
-          src={user.avatar}
+          src={user.avatar || '/static/mock-images/avatars/avatar-anika_visser.png'}
         >
           <UserCircleIcon fontSize="small" />
         </Avatar>
       </Box>
-      {/* <AccountPopover
+      <AccountPopover
         anchorEl={anchorRef.current}
         onClose={handleClosePopover}
         open={openPopover}
-      /> */}
+      />
     </>
   );
 };
 
 export const MainNavbar: FC<MainNavbarProps> = (props) => {
   const { onOpenSidebar, ...other } = props;
+
+  const { isAuthenticated } = useAuth();
 
   const [isOfferDialogOpen, setOfferDialogOpen] = useState(false);
 
@@ -143,12 +142,16 @@ export const MainNavbar: FC<MainNavbarProps> = (props) => {
           <Typography color="text.primary" variant='h5'>Rent service</Typography>
         </Link>
         <Box sx={{ flexGrow: 1 }} />
-        <Button
-          variant="contained"
-          onClick={() => handleRowClick()}
-        >
-          Добавить объявление
-        </Button>
+        {isAuthenticated &&
+          (
+            <Button
+            variant="contained"
+            onClick={() => handleRowClick()}
+          >
+            Добавить объявление
+          </Button>
+          )
+        }
         <AccountButton />
       </Toolbar>
       <OfferDialog

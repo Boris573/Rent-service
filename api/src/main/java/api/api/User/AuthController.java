@@ -43,28 +43,25 @@ public class AuthController {
   @PostMapping("login")
   public ResponseEntity<UserView> login(@RequestBody @Valid AuthRequest request) {
     try {
-      var authentication =
-          authenticationManager.authenticate(
-              new UsernamePasswordAuthenticationToken(request.username(), request.password()));
+      var authentication = authenticationManager.authenticate(
+          new UsernamePasswordAuthenticationToken(request.username(), request.password()));
 
       var user = (User) authentication.getPrincipal();
 
       var now = Instant.now();
       var expiry = 36000L;
 
-      var scope =
-          authentication.getAuthorities().stream()
-              .map(GrantedAuthority::getAuthority)
-              .collect(joining(" "));
+      var scope = authentication.getAuthorities().stream()
+          .map(GrantedAuthority::getAuthority)
+          .collect(joining(" "));
 
-      var claims =
-          JwtClaimsSet.builder()
-              .issuer("api.api")
-              .issuedAt(now)
-              .expiresAt(now.plusSeconds(expiry))
-              .subject(format("%s,%s", user.getId(), user.getUsername()))
-              .claim("roles", scope)
-              .build();
+      var claims = JwtClaimsSet.builder()
+          .issuer("api.api")
+          .issuedAt(now)
+          .expiresAt(now.plusSeconds(expiry))
+          .subject(format("%s,%s", user.getId(), user.getUsername()))
+          .claim("roles", scope)
+          .build();
 
       var token = this.jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
 
@@ -78,6 +75,28 @@ public class AuthController {
 
   @PostMapping("register")
   public UserView register(@RequestBody @Valid CreateUserRequest request) {
-    return userService.create(request);
+    var authentication = authenticationManager.authenticate(
+        new UsernamePasswordAuthenticationToken(request.username(), request.password()));
+
+    var user = (User) authentication.getPrincipal();
+
+    var now = Instant.now();
+    var expiry = 36000L;
+
+    var scope = authentication.getAuthorities().stream()
+        .map(GrantedAuthority::getAuthority)
+        .collect(joining(" "));
+
+    var claims = JwtClaimsSet.builder()
+        .issuer("api.api")
+        .issuedAt(now)
+        .expiresAt(now.plusSeconds(expiry))
+        .subject(format("%s,%s", user.getId(), user.getUsername()))
+        .claim("roles", scope)
+        .build();
+
+    var token = this.jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+    
+    return userService.create(request, token);
   }
 }

@@ -3,6 +3,7 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { itemApi } from '../api/item';
 import type { AppThunk } from '../store';
 import type { Item, ItemBody } from '../types/item';
+import { useAuth } from 'src/hooks/useAuth';
 
 interface ItemState {
   items: Item[];

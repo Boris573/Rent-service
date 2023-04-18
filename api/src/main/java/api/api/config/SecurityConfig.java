@@ -13,8 +13,8 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
@@ -45,6 +45,7 @@ import org.springframework.web.filter.CorsFilter;
 @EnableGlobalMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true)
 @RequiredArgsConstructor
 @Configuration
+@EnableMongoAuditing
 public class SecurityConfig {
 
   private final UserRepository userRepo;
@@ -66,12 +67,10 @@ public class SecurityConfig {
       HttpSecurity http, BCryptPasswordEncoder bCryptPasswordEncoder) throws Exception {
     return http.getSharedObject(AuthenticationManagerBuilder.class)
         .userDetailsService(
-            username ->
-                userRepo
-                    .findByUsername(username)
-                    .orElseThrow(
-                        () ->
-                            new UsernameNotFoundException(format("User: %s, not found", username))))
+            username -> userRepo
+                .findByUsername(username)
+                .orElseThrow(
+                    () -> new UsernameNotFoundException(format("User: %s, not found", username))))
         .passwordEncoder(bCryptPasswordEncoder)
         .and()
         .build();
@@ -83,15 +82,23 @@ public class SecurityConfig {
     http.sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
     http.exceptionHandling(
-        (exceptions) ->
-            exceptions
-                .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
-                .accessDeniedHandler(new BearerTokenAccessDeniedHandler()));
+        (exceptions) -> exceptions
+            .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
+            .accessDeniedHandler(new BearerTokenAccessDeniedHandler()));
 
     http.authorizeHttpRequests()
-        .antMatchers("/api/items", "/api/items/**").permitAll()
+        .antMatchers(this.restApiDocPath).permitAll()
+        .antMatchers(this.swaggerPath).permitAll()
         .antMatchers("/api/auth/**")
         .permitAll()
+        .antMatchers("/v2/api-docs", "/rest-api-docs/**", "/swagger-resources", "/swagger-resources/configuration/security", "/swagger-ui/**", "/webjars/**")
+        .permitAll()
+        .and()
+        .authorizeHttpRequests()
+        .antMatchers(HttpMethod.GET, "/api/items/**")
+        .permitAll()
+        .and()
+        .authorizeHttpRequests()
         .anyRequest()
         .authenticated()
         .and()

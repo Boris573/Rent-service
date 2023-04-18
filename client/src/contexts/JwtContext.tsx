@@ -2,7 +2,7 @@ import { createContext, useEffect, useReducer } from 'react';
 import type { FC, ReactNode } from 'react';
 import PropTypes from 'prop-types';
 import { authApi } from 'src/api/auth';
-import type { Admin } from 'src/types/admin';
+import type { Admin, AdminBody } from 'src/types/admin';
 
 interface State {
   isInitialized: boolean;
@@ -14,7 +14,7 @@ export interface AuthContextValue extends State {
   platform: 'JWT';
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  register: (fullName: string, email: string, password: string) => Promise<void>;
+  register: (user: AdminBody) => Promise<void>;
 }
 
 interface AuthProviderProps {
@@ -124,9 +124,10 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
     const initialize = async (): Promise<void> => {
       try {
         const accessToken = globalThis.localStorage.getItem('accessToken');
-        const user = JSON.parse(globalThis.localStorage.getItem('user'))
 
         if (accessToken) {
+          const { organization, ...user } = await authApi.me();
+
           dispatch({
             type: ActionType.INITIALIZE,
             payload: {
@@ -160,6 +161,7 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
 
   const loginUser = async (email: string, password: string): Promise<void> => {
     const { token, ...user } = await authApi.login(email, password);
+    console.log(token)
 
     localStorage.setItem('accessToken', token);
 
@@ -177,13 +179,11 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
   };
 
   const registerUser = async (
-    fullName: string,
-    email: string,
-    password: string
+    userData: AdminBody
   ): Promise<void> => {
-    const { token, ...user } = await authApi.register(fullName, email, password);
+    const { token, ...user } = await authApi.register(userData);
+    console.log(token)
     localStorage.setItem('accessToken', token);
-    localStorage.setItem('user', JSON.stringify(user));
 
     if (user) {
       dispatch({
