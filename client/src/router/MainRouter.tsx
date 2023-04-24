@@ -3,7 +3,6 @@ import { SplashScreen } from '../components/Layout/SplashScreen';
 
 import AppRouter from './AppRouter';
 import AuthRouter from './AuthRouter';
-import OnboardingRouter from './OnboardingRouter';
 
 const MainRouter = () => {
   const { isAuthenticated, isInitialized } = useAuth();

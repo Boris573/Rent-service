@@ -8,6 +8,7 @@ public record CreateUserRequest(
   @NotBlank String username,
   @NotBlank String fullName,
   @NotBlank String password,
+  @NotBlank String phone,
   @NotBlank String avatar,
   Set<String> authorities) {
 
@@ -21,8 +22,9 @@ public record CreateUserRequest(
     String username,
     String fullName,
     String password,
+    String phone,
     String avatar
   ) {
-    this(username, fullName, password, avatar, new HashSet<>());
+    this(username, fullName, password, phone, avatar, new HashSet<>());
   }
 }

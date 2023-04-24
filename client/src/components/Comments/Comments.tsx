@@ -1,25 +1,16 @@
 import { Box } from "@mui/system";
-import { FC, useEffect, useMemo, useState } from "react";
+import { FC, useEffect } from "react";
 import { useDispatch, useSelector } from "src/store";
 import * as Yup from "yup";
-import { createItem, getItemById, updateItem } from "src/slices/item";
-import { useParams } from "react-router-dom";
-import { Button, Grid, IconButton, TextField, Typography } from "@mui/material";
-import OfferDialog from "../HouseDialog";
-import { Image as ImageIcon } from "../../assets/icons/image";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
-import { DemoContainer, DemoItem } from "@mui/x-date-pickers/internals/demo";
+import { Button, IconButton, TextField, Typography } from "@mui/material";
 import { Trash as TrashIcon } from "../../assets/icons/trash";
 import moment from "moment";
-import { useAuth } from "src/hooks/useAuth";
-import { Item, ItemBody } from "src/types/item";
+import { Item } from "src/types/item";
 import { Admin, ADMIN_ROLES } from "src/types/admin";
 import { useFormik } from "formik";
 import toast from "react-hot-toast";
-import { Comment, CommentBody } from "src/types/comment";
+import { CommentBody } from "src/types/comment";
 import {
-  updateComment,
   createComment,
   getCommentsByItemId,
   deleteComment,
@@ -64,7 +55,6 @@ const Comments: FC<CommentsProps> = ({ item, user }) => {
           userId: user?.id,
           username: user?.username,
         };
-        console.log(data)
 
         await dispatch(createComment(data));
         toast.success("Объявление добавлено");
@@ -79,8 +69,6 @@ const Comments: FC<CommentsProps> = ({ item, user }) => {
       }
     },
   });
-
-  console.log(comments);
 
   return (
     <Box
@@ -146,7 +134,9 @@ const Comments: FC<CommentsProps> = ({ item, user }) => {
               )}
             </Box>
             <Box display="flex" width="100%" flexDirection="row" justifyContent="space-between">
-              <Typography>{comment?.text}</Typography>
+              <Typography
+                style={{ whiteSpace: "pre-line" }}
+              >{comment?.text}</Typography>
               {(user?.id === comment?.userId || user?.role === ADMIN_ROLES.ADMIN) && (
                 <IconButton onClick={() => handleDelete(comment.id)}>
                   <TrashIcon color="error" />

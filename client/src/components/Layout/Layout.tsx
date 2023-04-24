@@ -4,7 +4,7 @@ import { Container } from '@mui/material';
 
 const Layout: React.FC = () => {
   return (
-    <Container maxWidth="xl" sx={{ paddingTop: 2 }}>
+    <Container maxWidth="xl">
       <Outlet />
     </Container>
   );

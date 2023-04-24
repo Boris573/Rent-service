@@ -1,31 +1,5 @@
 import type { FC } from 'react';
-import { Box } from '@mui/material';
-import { Logo } from './Logo';
-import { keyframes } from '@emotion/react';
-
-const bounce1 = keyframes`
-  0% {
-    transform: translate3d(0, 0, 0);
-  }
-  50% {
-    transform: translate3d(0, 1px, 0);
-  }
-  100% {
-    transform: translate3d(0, 0, 0);
-  }
-`;
-
-const bounce3 = keyframes`
-  0% {
-    transform: translate3d(0, 0, 0);
-  }
-  50% {
-    transform: translate3d(0, 3px, 0);
-  }
-  100% {
-    transform: translate3d(0, 0, 0);
-  }
-`;
+import { Box, Typography } from '@mui/material';
 
 export const SplashScreen: FC = () => (
   <Box
@@ -44,17 +18,6 @@ export const SplashScreen: FC = () => (
       zIndex: 2000
     }}
   >
-    <Logo
-      sx={{
-        height: 80,
-        width: 80,
-        '& path:nth-child(1)': {
-          animation: `${bounce1} 1s ease-in-out infinite`
-        },
-        '& path:nth-child(3)': {
-          animation: `${bounce3} 1s ease-in-out infinite`
-        }
-      }}
-    />
+    <Typography variant='h4' color="primary">Загрузка...</Typography>
   </Box>
 );
