@@ -15,6 +15,7 @@ export interface Order {
     dateFrom?: string;
     dateTo?: string;
     item: string;
+    phone: string;
     totalPrice: number;
     createdAt?: string;
     updatedAt?: string;

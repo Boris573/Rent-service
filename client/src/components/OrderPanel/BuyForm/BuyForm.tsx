@@ -1,23 +1,12 @@
 import { Box } from "@mui/system";
-import { FC, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "src/store";
-import { getItemById } from "src/slices/item";
-import { useParams } from "react-router-dom";
-import { Button, Grid, Typography } from "@mui/material";
-import { Image as ImageIcon } from "../../../../assets/icons/image";
-import * as Yup from "yup";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { FC } from "react";
+import { Button, TextField, Typography } from "@mui/material";
+import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
-import moment from "moment";
-import { FormikProps, useFormik } from "formik";
-import toast from "react-hot-toast";
-import { createOrder, getOrdersByItemId } from "src/slices/order";
 import { Order } from "src/types/order";
 import { Admin } from "src/types/admin";
 import { Item } from "src/types/item";
-import { checkIntervalsOverlapping } from "src/utils/check-intervals-overlapping";
 import { formatPrice } from "src/utils/price";
-import { FormValues } from "../OrderPanel";
 import { ORDER_TYPES } from "../constants";
 
 interface BuyFormProps {
@@ -55,8 +44,17 @@ const BuyForm: FC<BuyFormProps> = ({ item, user, orders, formik }) => {
         ? null
         : user?.id !== item?.host ? (
           <LocalizationProvider dateAdapter={AdapterMoment}>
-            <Box display="flex" flexDirection="row">
-  
+            <Box sx={{ mt: 2 }}>
+              <TextField
+                error={Boolean(formik.touched.phone && formik.errors.phone)}
+                fullWidth
+                helperText={formik.touched.phone && formik.errors.phone}
+                label="Введите телефон для связи"
+                name="phone"
+                onBlur={formik.handleBlur}
+                onChange={formik.handleChange}
+                value={formik.values.phone}
+              />
             </Box>
             <Button
               sx={{

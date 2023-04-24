@@ -1,11 +1,6 @@
 import { Box } from "@mui/system";
-import { FC, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "src/store";
-import { getItemById } from "src/slices/item";
-import { useParams } from "react-router-dom";
-import { Button, Grid, Typography } from "@mui/material";
-import { Image as ImageIcon } from "../../../../assets/icons/image";
-import * as Yup from "yup";
+import { FC, useMemo } from "react";
+import { Button, TextField, Typography } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import moment from "moment";
@@ -26,8 +21,6 @@ const RentForm: FC<RentFormProps> = ({ item, user, orders, formik }) => {
   const bookedPeriods = useMemo(() => orders.map((order) => ({dateFrom: order.dateFrom, dateTo: order.dateTo })), [orders])
 
   const { rentPrice, isRent } = item ?? {};
-
-  console.log(formik)
 
   return (
     <Box
@@ -151,6 +144,18 @@ const RentForm: FC<RentFormProps> = ({ item, user, orders, formik }) => {
               </Typography>
             </Box>
           )}
+          <Box sx={{ mt: 2 }}>
+            <TextField
+              error={Boolean(formik.touched.phone && formik.errors.phone)}
+              fullWidth
+              helperText={formik.touched.phone && formik.errors.phone}
+              label="Введите телефон для связи"
+              name="phone"
+              onBlur={formik.handleBlur}
+              onChange={formik.handleChange}
+              value={formik.values.phone}
+            />
+          </Box>
           <Button
             sx={{
               mt: 2,

@@ -1,13 +1,8 @@
 import { Box } from "@mui/system";
 import { FC, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "src/store";
-import { getItemById } from "src/slices/item";
-import { useParams } from "react-router-dom";
-import { Button, Grid, Tab, Typography } from "@mui/material";
-import { Image as ImageIcon } from "../../../assets/icons/image";
+import { Grid, Tab, Typography } from "@mui/material";
 import * as Yup from "yup";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import moment from "moment";
 import { useFormik } from "formik";
@@ -16,8 +11,6 @@ import { createOrder, getOrdersByItemId } from "src/slices/order";
 import { OrderBody, ORDER_TYPES } from "src/types/order";
 import { Admin } from "src/types/admin";
 import { Item } from "src/types/item";
-import { checkIntervalsOverlapping } from "src/utils/check-intervals-overlapping";
-import { formatPrice } from "src/utils/price";
 import RentForm from "./RentForm";
 import BuyForm from "./BuyForm";
 
@@ -28,9 +21,10 @@ interface OrderPanelProps {
 
 export interface FormValues {
   type: ORDER_TYPES.RENT,
-  dateFrom: "",
-  dateTo: "",
-  totalPrice: "",
+  dateFrom: '',
+  dateTo: '',
+  totalPrice: '',
+  phone: '',
   submit: null,
 }
 
@@ -58,13 +52,15 @@ const OrderPanel: FC<OrderPanelProps> = ({ item, user }) => {
     enableReinitialize: true,
     initialValues: {
       type: ORDER_TYPES.BUY,
-      dateFrom: "",
-      dateTo: "",
-      totalPrice: "",
+      dateFrom: '',
+      dateTo: '',
+      totalPrice: '',
+      phone: '',
       submit: null,
     },
     validationSchema: Yup.object({
       type: Yup.string(),
+      phone: Yup.string().required('Укажите телефон, чтобы хозяин смог с вами связаться'),
       dateFrom: Yup.string().when('type', {
         is: ORDER_TYPES.RENT,
         then: Yup.string().required("Укажите, когда вы прибудете")
@@ -100,6 +96,7 @@ const OrderPanel: FC<OrderPanelProps> = ({ item, user }) => {
           dateFrom: values.type === ORDER_TYPES.RENT ? values.dateFrom : '',
           dateTo: values.type === ORDER_TYPES.RENT ? values.dateTo : '',
           totalPrice: totalPrice,
+          phone: values.phone,
           item: item.id,
           user: user.id,
         };
@@ -109,7 +106,6 @@ const OrderPanel: FC<OrderPanelProps> = ({ item, user }) => {
 
         formik.resetForm();
       } catch (err: any) {
-        console.log(err);
         toast.error("Что-то пошло не так");
         helpers.setStatus({ success: false });
         helpers.setErrors({ submit: err.message });
@@ -117,8 +113,6 @@ const OrderPanel: FC<OrderPanelProps> = ({ item, user }) => {
       }
     },
   });
-
-  console.log(formik)
 
   return (
     <Grid

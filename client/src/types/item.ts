@@ -32,16 +32,24 @@ export interface Item {
 
 export const itemTypeOptions = [
   {
-    label: "Дом",
-    value: "house",
+    label: 'Дом',
+    value: 'house',
   },
   {
-    label: "Квартира",
-    value: "flat",
+    label: 'Квартира',
+    value: 'flat',
   },
   {
-    label: "Комната",
-    value: "room",
+    label: 'Комната',
+    value: 'room',
+  },
+  {
+    label: 'Апартаменты',
+    value: 'aparts',
+  },
+  {
+    label: 'Вилла',
+    value: 'villa',
   },
 ];
 

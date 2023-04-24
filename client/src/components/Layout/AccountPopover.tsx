@@ -14,10 +14,7 @@ import {
   Typography
 } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
-// import { useAuth } from '../../hooks/useAuth';
-import { Cog as CogIcon } from '../../assets/icons/cog';
 import { UserCircle as UserCircleIcon } from '../../assets/icons/user-circle';
-import { SwitchHorizontalOutlined as SwitchHorizontalOutlinedIcon } from '../../assets/icons/switch-horizontal-outlined';
 import { useAuth } from 'src/hooks/useAuth';
 
 interface AccountPopoverProps {
@@ -112,18 +109,6 @@ export const AccountPopover: FC<AccountPopoverProps> = (props) => {
                   Профиль
                 </Typography>
               </Link>
-            )}
-          />
-        </MenuItem>
-        <MenuItem component="a">
-          <ListItemIcon>
-            <SwitchHorizontalOutlinedIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText
-            primary={(
-              <Typography variant="body1">
-                Моя корзина
-              </Typography>
             )}
           />
         </MenuItem>

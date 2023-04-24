@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo } from 'react';
+import { FC, useMemo } from 'react';
 import toast from 'react-hot-toast';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
@@ -11,13 +11,12 @@ import {
   FormControlLabel,
   Grid,
   IconButton,
-  Switch,
   TextField,
   Typography
 } from '@mui/material';
 import { Trash as TrashIcon } from '../../assets/icons/trash';
 import { createItem, deleteItem, updateItem } from '../../slices/item';
-import { useDispatch, useSelector } from '../../store';
+import { useDispatch } from '../../store';
 import { Item, ItemBody, itemTypeOptions } from '../../types/item';
 import CommonSelect from '../Common/CommonSelect';
 import { useAuth } from 'src/hooks/useAuth';
@@ -183,7 +182,8 @@ const OfferDialog: FC<OfferFormProps> = (props) => {
             hasElevator: values.hasElevator,
           },
         };
-        console.log(data)
+        formik.resetForm();
+
 
         if (item) {
           await dispatch(updateItem(item.id!, data));

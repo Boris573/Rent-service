@@ -3,6 +3,7 @@ export interface Admin {
   avatar?: string;
   username: string;
   fullName: string;
+  phone: string;
   role?: string;
 
   [key: string]: any;

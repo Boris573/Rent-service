@@ -12,8 +12,6 @@ const HouseListItem = ({ item }: Props) => {
 
   const itemType = itemTypeOptions.find((option) => option.value === type);
 
-  const price = rentPrice;
-
   return (
     <Link m={2} href={`/item/${id}`} underline="none" color="text">
       <Box
@@ -62,7 +60,8 @@ const HouseListItem = ({ item }: Props) => {
           <Typography color="text.secondary" variant="subtitle2">
             {itemType.label}
           </Typography>
-          <Typography variant="subtitle1">{formatPrice(price)}</Typography>
+          <Typography variant="subtitle2">Аренда: {formatPrice(rentPrice)}</Typography>
+          <Typography variant="subtitle2">Покупка: {formatPrice(buyPrice)}</Typography>
         </Box>
       </Box>
     </Link>

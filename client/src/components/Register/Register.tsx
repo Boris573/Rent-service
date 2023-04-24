@@ -18,7 +18,6 @@ import {
 import { Link } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { useMounted } from "../../hooks/useMounted";
-import { Logo } from "../Layout/Logo";
 import { AdminBody } from "src/types/admin";
 
 export const Register: FC = (props) => {
@@ -27,9 +26,10 @@ export const Register: FC = (props) => {
   const navigate = useNavigate();
   const formik = useFormik({
     initialValues: {
-      fullName: "",
-      username: "",
-      password: "",
+      fullName: '',
+      username: '',
+      phone: '',
+      password: '',
       avatar: '',
       submit: null,
     },
@@ -39,6 +39,7 @@ export const Register: FC = (props) => {
         fullName: values.fullName,
         username: values.fullName,
         password: values.password,
+        phone: values.phone,
         avatar: values.avatar,        
       }
       try {
@@ -127,6 +128,17 @@ export const Register: FC = (props) => {
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
                     value={formik.values.username}
+                  />
+                  <TextField
+                    error={Boolean(formik.touched.phone && formik.errors.phone)}
+                    fullWidth
+                    helperText={formik.touched.phone && formik.errors.phone}
+                    label="Номер телефона"
+                    margin="normal"
+                    name="phone"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    value={formik.values.phone}
                   />
                   <TextField
                     error={Boolean(

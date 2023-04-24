@@ -8,6 +8,7 @@ class AuthApi {
   ): Promise<{
     token: string;
     id: string;
+    phone: string;
     username: string;
     fullName: string;
    }> {
@@ -21,6 +22,7 @@ class AuthApi {
   ): Promise<{
     token: string;
     id: string;
+    phone: string;
     username: string;
     fullName: string;
    }> {
@@ -33,7 +35,7 @@ class AuthApi {
 
   async me(): Promise<Admin> {
     const { data } = await axiosInstance.get('/user/me');
-    console.log(data)
+
     return data;
   };
 }

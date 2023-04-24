@@ -1,29 +1,19 @@
 import { Box } from "@mui/system";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "src/store";
-import { getItemById, getItems } from "src/slices/item";
-import { useParams } from "react-router-dom";
+import { getItems } from "src/slices/item";
 import { UserCircle as UserCircleIcon } from "../../assets/icons/user-circle";
 import {
   Avatar,
-  Button,
-  Card,
-  Divider,
-  FormHelperText,
-  Grid,
   Tab,
-  TextField,
   Typography,
 } from "@mui/material";
-import { Image as ImageIcon } from "../../assets/icons/image";
 import { useAuth } from "src/hooks/useAuth";
-import HouseListItem from "../HouseListItem";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
-import { getOrdersByUserId } from "src/slices/order";
+import { getOrders, getOrdersByUserId } from "src/slices/order";
 import { PROFILE_TABS } from "./constants";
-import { ORDER_TYPES, ORDER_TYPES_LABEL } from "src/types/order";
-import { formatPrice } from "src/utils/price";
-import moment from "moment";
+import ItemOrderList from "./ItemOrderList";
+import Order from "./Order";
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -37,13 +27,12 @@ const Profile = () => {
   useEffect(() => {
     dispatch(getItems());
     dispatch(getOrdersByUserId(id));
+    dispatch(getOrders());
   }, []);
 
-  const orderedItems = useMemo(() => {
-    return items.filter((item) =>
-      orders.find((order) => order.item === item.id)
-    );
-  }, [items, orders]);
+  const userItems = useMemo(() => {
+    return items.filter((item) => item.host === user.id);
+  }, [items, user]);
 
   const handleTabChange = (e: React.SyntheticEvent, newValue: string) => {
     setActiveTab(newValue);
@@ -129,107 +118,11 @@ const Profile = () => {
               p={4}
             >
               {orders.map((order) => {
-                const {
-                  id: orderId,
-                  dateFrom,
-                  dateTo,
-                  orderType,
-                  totalPrice,
-                } = order;
                 const orderItem = items.find((item) => item.id === order.item);
 
-                return orderItem && (
-                  <Card
-                    elevation={16}
-                    sx={{
-                      width: "80%",
-                      minHeight: 50,
-                      p: 2,
-                      mb: 2,
-                      cursor: "pointer",
-                    }}
-                    key={orderId}
-                  >
-                    <Box
-                      display="flex"
-                      flexDirection="row"
-                      justifyContent="space-between"
-                      alignItems="center"
-                    >
-                      <Box
-                        display="flex"
-                        flexDirection="row"
-                        alignItems="center"
-                      >
-                        {orderItem.image ? (
-                          <Box
-                            sx={{
-                              alignItems: "center",
-                              backgroundColor: "background.default",
-                              backgroundImage: `url(${orderItem.image})`,
-                              backgroundPosition: "center",
-                              backgroundSize: "cover",
-                              borderRadius: 1,
-                              display: "flex",
-                              justifyContent: "center",
-                              overflow: "hidden",
-                              width: 90,
-                              height: 90,
-                            }}
-                          />
-                        ) : (
-                          <Box
-                            sx={{
-                              alignItems: "center",
-                              backgroundColor: "divider",
-                              borderRadius: 1,
-                              display: "flex",
-                              justifyContent: "center",
-                              width: 90,
-                              height: 90,
-                            }}
-                          >
-                            <ImageIcon />
-                          </Box>
-                        )}
-                        <Box ml={2} display="flex" flexDirection="column">
-                          <Box display="flex" flexDirection="row">
-                            <Typography  color="primary" variant="h6">
-                              {ORDER_TYPES_LABEL[orderType]}
-                            </Typography>
-                            <Typography
-                              ml={1}
-                              color="text.secondary"
-                              variant="body2"
-                            >
-                              {orderType === ORDER_TYPES.RENT &&
-                                `(${dateFrom} - ${dateTo})`}
-                            </Typography>
-                          </Box>
-                          <Typography
-                              color="text.secondary"
-                              variant="body2"
-                            >
-                            {orderItem.city}, {orderItem.street}, {orderItem.houseNumber}
-                          </Typography>
-                          <Typography
-                              color="text.secondary"
-                              variant="body2"
-                            >
-                            {order.createdAt && moment(order.createdAt).format('DD/MM/YYYY')}
-                          </Typography>
-                        </Box>
-                      </Box>
-                      <Box justifySelf="flex-end">
-                        <Typography variant="h6">
-                          {formatPrice(totalPrice)}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </Card>
-                );
+                return orderItem && <Order key={order.id} order={order} item={orderItem} />;
               })}
-            </Box>{" "}
+            </Box>
           </TabPanel>
           <TabPanel value={PROFILE_TABS.ITEMS}>
             <Box
@@ -240,9 +133,11 @@ const Profile = () => {
               justifyContent="left"
               p={4}
             >
-              {orderedItems.map((item) => (
-                <HouseListItem key={item.id} item={item} />
-              ))}
+              {userItems.map((item) => {
+                const itemOrders = orders.filter((order) => order.item === item.id);
+
+                return <ItemOrderList key={item.id} orders={itemOrders} item={item} />
+              })}
             </Box>{" "}
           </TabPanel>
         </Box>

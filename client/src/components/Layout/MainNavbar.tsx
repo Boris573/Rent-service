@@ -1,30 +1,23 @@
-import React, { useRef, useState, FC } from 'react';
-import PropTypes from 'prop-types';
+import { useRef, useState, FC } from 'react';
 import {
   AppBar,
   Avatar,
   Box,
   Button,
   ButtonBase,
-  IconButton,
   Link,
   Toolbar,
   Typography
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import type { AppBarProps } from '@mui/material';
-import { Menu as MenuIcon } from '../../assets/icons/menu';
 import { UserCircle as UserCircleIcon } from '../../assets/icons/user-circle';
 import OfferDialog from '../HouseDialog';
 import { getItems } from 'src/slices/item';
 import { useAuth } from 'src/hooks/useAuth';
 import { AccountPopover } from './AccountPopover';
-// import { AccountPopover } from './AccountPopover';
 
-interface MainNavbarProps extends AppBarProps {
-  onOpenSidebar?: () => void;
-  sidebarHidden?: boolean;
-}
+interface MainNavbarProps extends AppBarProps {}
 
 const MainNavbarRoot = styled(AppBar)(
   ({ theme }) => ({
@@ -90,7 +83,7 @@ const AccountButton = () => {
 };
 
 export const MainNavbar: FC<MainNavbarProps> = (props) => {
-  const { onOpenSidebar, ...other } = props;
+  const { ...other } = props;
 
   const { isAuthenticated } = useAuth();
 
@@ -111,10 +104,10 @@ export const MainNavbar: FC<MainNavbarProps> = (props) => {
     <MainNavbarRoot
       sx={{
         left: {
-          lg: props.sidebarHidden ? 0 : 280
+          lg: 0
         },
         width: {
-          lg: props.sidebarHidden ? '100%' : 'calc(100% - 280px)'
+          lg: '100%',
         }
       }}
       {...other}
@@ -127,17 +120,6 @@ export const MainNavbar: FC<MainNavbarProps> = (props) => {
           px: 2
         }}
       >
-        <IconButton
-          onClick={onOpenSidebar}
-          sx={{
-            display: {
-              xs: 'inline-flex',
-              lg: 'none'
-            }
-          }}
-        >
-          <MenuIcon fontSize="small" />
-        </IconButton>
         <Link href="/" underline="none">
           <Typography color="text.primary" variant='h5'>Rent service</Typography>
         </Link>
@@ -163,9 +145,4 @@ export const MainNavbar: FC<MainNavbarProps> = (props) => {
       />
     </MainNavbarRoot>
   );
-};
-
-MainNavbar.propTypes = {
-  onOpenSidebar: PropTypes.func,
-  sidebarHidden: PropTypes.bool
 };

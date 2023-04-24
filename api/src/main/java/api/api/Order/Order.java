@@ -23,6 +23,7 @@ public class Order {
     private Number totalPrice;
     private String user;
     private String item;
+    private String phone;
     private String orderType;
     @CreatedDate
     private LocalDateTime createdAt;

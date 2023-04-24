@@ -161,7 +161,6 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
 
   const loginUser = async (email: string, password: string): Promise<void> => {
     const { token, ...user } = await authApi.login(email, password);
-    console.log(token)
 
     localStorage.setItem('accessToken', token);
 
@@ -182,7 +181,6 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
     userData: AdminBody
   ): Promise<void> => {
     const { token, ...user } = await authApi.register(userData);
-    console.log(token)
     localStorage.setItem('accessToken', token);
 
     if (user) {
